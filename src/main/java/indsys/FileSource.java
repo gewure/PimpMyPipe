@@ -16,7 +16,7 @@ public class FileSource<T, U> implements IOable<T, U>{
 	private static final String FILE_NAME = "aliceInWonderland.txt";
 	private static final String OUT_FILE_NAME = "filtered_" + FILE_NAME;
 
-	//P.S. I think this is absolutely wrong. 
+	//FIXME: P.S. I think this is absolutely wrong. 
 	
 	public U read() throws StreamCorruptedException {
 		try(BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
