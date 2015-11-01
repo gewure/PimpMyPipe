@@ -18,7 +18,7 @@ public class RemotePipe<T> extends UnicastRemoteObject implements RemoteIOable<T
         try {
             return m_pipe.read();
         } catch (StreamCorruptedException e) {
-            throw new RemoteException("Error on reading from remote-pipe", e);
+            throw new RemoteException("Error on reading from remote-indsys.pipes", e);
         } 
     }
 

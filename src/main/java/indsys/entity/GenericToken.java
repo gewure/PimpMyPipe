@@ -1,0 +1,33 @@
+package indsys.entity;
+
+/**
+ * Created by sereGkaluv on 01-Nov-15.
+ */
+public class GenericToken<T, U> implements IGenericToken<T, U> {
+    protected final T _id;
+    protected U _value;
+
+    protected GenericToken(T id) {
+        _id = id;
+    }
+
+    protected GenericToken(T id, U value) {
+        _id = id;
+        _value = value;
+    }
+
+    @Override
+    public U getValue() {
+        return _value;
+    }
+
+    @Override
+    public void setValue(U value) {
+        _value = value;
+    }
+
+    @Override
+    public T getId() {
+        return _id;
+    }
+}

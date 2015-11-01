@@ -25,16 +25,16 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
     }
 
     /**
-     * read an entity from the thirdparty.filter. the thirdparty.filter will act like an passive-thirdparty.filter
+     * read an indsys.entity from the thirdparty.indsys.filter. the thirdparty.indsys.filter will act like an passive-thirdparty.indsys.filter
      */
     public out read() throws StreamCorruptedException{
-        // just read the next entity and return it 
+        // just read the next indsys.entity and return it
         return getNextEntity();
     }
 
     /**
-     * write an entity into the thirdparty.filter. the thirdparty.filter will act like an passive-thirdparty.filter
-     * and passes the entity to the next thirdparty.filter, after it processed it
+     * write an indsys.entity into the thirdparty.indsys.filter. the thirdparty.indsys.filter will act like an passive-thirdparty.indsys.filter
+     * and passes the indsys.entity to the next thirdparty.indsys.filter, after it processed it
      * @param value
      * @throws StreamCorruptedException
      */
@@ -55,8 +55,8 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
     }
     
     /**
-     * reads the whole next entity from input
-     * @return the next entity
+     * reads the whole next indsys.entity from input
+     * @return the next indsys.entity
      * @throws StreamCorruptedException
      */
     protected out getNextEntity() throws StreamCorruptedException {
@@ -80,7 +80,7 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
     }
     
     /**
-     * runs the thirdparty.filter in active-mode
+     * runs the thirdparty.indsys.filter in active-mode
      */
     public void run() {
         out output = null;//getNewEntityObject();
@@ -103,10 +103,10 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
     }
     
     /**
-     * fill the entity with the next given value
+     * fill the indsys.entity with the next given value
      * @param nextVal
      * @param entity
-     * @return true if the entity is finished
+     * @return true if the indsys.entity is finished
      */
     protected abstract boolean fillEntity(in nextVal, out entity);
     /**

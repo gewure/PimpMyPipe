@@ -37,7 +37,7 @@ public abstract class DataTransformationFilter<T> extends AbstractFilter<T,T> {
     }
     
     /**
-     * does the transformation on entity
+     * does the transformation on indsys.entity
      * @param entity
      */
     protected abstract void process(T entity);

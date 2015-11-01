@@ -42,7 +42,7 @@ public class BufferedSyncPipe<T> implements IOable<T, T>{
 				wait();
 			} catch (InterruptedException e){}
 		}
-		 m_Buf.addLast(value);
+		m_Buf.addLast(value);
 		notifyAll();	// waiting in read
 	}
 }
