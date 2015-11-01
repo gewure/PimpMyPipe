@@ -14,8 +14,7 @@ import java.util.List;
  */
 public class MainApp {
     private static final int MAX_BUFFER = Integer.MAX_VALUE;
-    //Should be changed manually
-    private static final String SOURCE_FILE_PATH = "C:\\Users\\sereGkaluv\\IdeaProjects\\PimpMyPipe\\src\\main\\resources\\aliceInWonderland.txt";
+    private static final String SOURCE_FILE_PATH = "shortTask.txt";
     private static final String OUTPUT_FILE_PATH = "out.txt";
 
     public static void main(String[] args) {
