@@ -1,15 +1,7 @@
-package pipes;
+package thirdparty.pipes;
 
-import interfaces.IOable;
-
-import java.io.IOException;
 import java.io.StreamCorruptedException;
-import java.rmi.MarshalledObject;
-import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.activation.Activatable;
-import java.rmi.activation.ActivationException;
-import java.rmi.activation.ActivationID;
 import java.rmi.server.UnicastRemoteObject;
 
 public class RemotePipe<T> extends UnicastRemoteObject implements RemoteIOable<T>{

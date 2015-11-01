@@ -1,6 +1,6 @@
-package filter;
+package thirdparty.filter;
 
-import interfaces.Readable;
+import thirdparty.interfaces.Readable;
 
 public abstract class Sink<T> implements Readable<T>, Runnable{
 

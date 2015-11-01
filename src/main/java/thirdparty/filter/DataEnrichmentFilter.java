@@ -1,13 +1,10 @@
-package filter;
+package thirdparty.filter;
 
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
-import javax.print.attribute.standard.OutputDeviceAssigned;
-
-import interfaces.IOable;
-import interfaces.Readable;
-import interfaces.Writeable;
+import thirdparty.interfaces.Readable;
+import thirdparty.interfaces.Writable;
 
 public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, out> implements Runnable {
 
@@ -15,7 +12,7 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
     private boolean m_EndOfStream = false;
 
 
-    public DataEnrichmentFilter(Readable<in> input, Writeable<out> output) throws InvalidParameterException {
+    public DataEnrichmentFilter(Readable<in> input, Writable<out> output) throws InvalidParameterException {
         super(input, output);
     }
 
@@ -23,12 +20,12 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
         super(input);
     }
 
-    public DataEnrichmentFilter(Writeable<out> output) throws InvalidParameterException {
+    public DataEnrichmentFilter(Writable<out> output) throws InvalidParameterException {
         super(output);
     }
 
     /**
-     * read an entity from the filter. the filter will act like an passive-filter
+     * read an entity from the thirdparty.filter. the thirdparty.filter will act like an passive-thirdparty.filter
      */
     public out read() throws StreamCorruptedException{
         // just read the next entity and return it 
@@ -36,8 +33,8 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
     }
 
     /**
-     * write an entity into the filter. the filter will act like an passive-filter 
-     * and passes the entity to the next filter, after it processed it
+     * write an entity into the thirdparty.filter. the thirdparty.filter will act like an passive-thirdparty.filter
+     * and passes the entity to the next thirdparty.filter, after it processed it
      * @param value
      * @throws StreamCorruptedException
      */
@@ -83,7 +80,7 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
     }
     
     /**
-     * runs the filter in active-mode
+     * runs the thirdparty.filter in active-mode
      */
     public void run() {
         out output = null;//getNewEntityObject();

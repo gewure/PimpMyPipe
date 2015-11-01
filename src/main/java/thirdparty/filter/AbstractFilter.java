@@ -1,15 +1,15 @@
-package filter;
+package thirdparty.filter;
 
-import interfaces.IOable;
-import interfaces.Readable;
-import interfaces.Writeable;
+import thirdparty.interfaces.IOable;
+import thirdparty.interfaces.Readable;
+import thirdparty.interfaces.Writable;
 
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
 public abstract class AbstractFilter<in, out> implements IOable<in, out>, Runnable {
     private Readable<in> m_Input = null;
-    private Writeable<out> m_Output = null;
+    private Writable<out> m_Output = null;
     
     public static Object ENDING_SIGNAL = null;
     
@@ -21,14 +21,14 @@ public abstract class AbstractFilter<in, out> implements IOable<in, out>, Runnab
         m_Input = input;
     }
     
-    public AbstractFilter(Writeable<out> output)throws InvalidParameterException{
+    public AbstractFilter(Writable<out> output)throws InvalidParameterException{
         if (output == null){
             throw new InvalidParameterException("output can't be null!");
         }
         m_Output = output;
     }
     
-    public AbstractFilter(Readable<in> input, Writeable<out> output)throws InvalidParameterException{
+    public AbstractFilter(Readable<in> input, Writable<out> output)throws InvalidParameterException{
         if (input == null){
             throw new InvalidParameterException("input can't be null!");
         }else if (output == null){

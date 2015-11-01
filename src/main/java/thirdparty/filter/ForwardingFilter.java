@@ -1,47 +1,37 @@
-package filter;
+package thirdparty.filter;
 
-import interfaces.IOable;
-import interfaces.Readable;
-import interfaces.Writeable;
+import thirdparty.interfaces.Readable;
+import thirdparty.interfaces.Writable;
 
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
 
+public class ForwardingFilter<T> extends AbstractFilter <T,T> {
 
-public abstract class DataTransformationFilter<T> extends AbstractFilter<T,T> {
-
-    public DataTransformationFilter(Readable<T> input, Writeable<T> output) throws InvalidParameterException {
+    public ForwardingFilter(Readable<T> input, Writable<T> output) throws InvalidParameterException {
         super(input, output);
 
     }
 
-    public DataTransformationFilter(Readable<T> input) throws InvalidParameterException {
+    public ForwardingFilter(Readable<T> input) throws InvalidParameterException {
         super(input);
 
     }
 
-    public DataTransformationFilter(Writeable<T> output) throws InvalidParameterException {
+    public ForwardingFilter(Writable<T> output) throws InvalidParameterException {
         super(output);
-
     }
 
     public T read() throws StreamCorruptedException {
-        T entity = readInput();
-        if (entity != null) process(entity);
-        return entity;
+        return readInput();
     }
 
     public void write(T value) throws StreamCorruptedException {
-        if (value != null) process(value);
         writeOutput(value);
     }
     
-    /**
-     * does the transformation on entity
-     * @param entity
-     */
-    protected abstract void process(T entity);
+
 
     public void run() {
         T input = null;
@@ -50,7 +40,6 @@ public abstract class DataTransformationFilter<T> extends AbstractFilter<T,T> {
     
                 input = readInput();
                 if (input != null) {
-                    process(input);
                     writeOutput(input);
                 }
                 
@@ -61,7 +50,4 @@ public abstract class DataTransformationFilter<T> extends AbstractFilter<T,T> {
             e.printStackTrace();
         }
     }
-    
-    
-
 }

@@ -1,12 +1,10 @@
-package pipes;
+package thirdparty.pipes;
 
 import java.io.StreamCorruptedException;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import interfaces.IOable;
+import thirdparty.interfaces.IOable;
 
 public class RemotePipeProxy<T> implements IOable<T, T>{
 
