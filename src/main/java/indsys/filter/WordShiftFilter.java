@@ -30,9 +30,10 @@ public class WordShiftFilter extends DataEnrichmentFilter<WordList, List<WordLis
                 return true;
             }
 
-            entity.add(id, wordList);
+            entity.add(wordList);
 
-            for (int shift = 0; shift < tempList.size() - 1; ++shift) {
+            int shiftSteps = tempList.size() - 1;
+            for (int shift = 0; shift < shiftSteps; ++shift) {
                 Word tempWord = tempList.removeFirst();
                 tempList.addLast(tempWord);
 

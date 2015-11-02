@@ -13,7 +13,6 @@ import java.util.List;
  * Created by sereGkaluv on 01-Nov-15.
  */
 public class MainApp {
-    private static final int MAX_BUFFER = Integer.MAX_VALUE;
     private static final String SOURCE_FILE_PATH = "shortTask.txt";
     private static final String OUTPUT_FILE_PATH = "out.txt";
 
