@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by f00 on 02.11.15.
+ * Filters a List of sentence of words for the first word and if it is contained in the Set<String> dictionary
+ * it is removed from the sentence
  */
 public class DictionaryFilter extends DataTransformationFilter<List<WordList>> {
 
