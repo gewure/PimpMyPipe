@@ -39,11 +39,10 @@ public class WordsListToStringLineList extends DataEnrichmentFilter<List<WordLis
 
                 for (Word word : words.getValue()) {
                     sb.append(word.getValue());
-
-                    if (--wordsListSize > 0) {
-                        sb.append(DELIMITER);
-                    }
+                    sb.append(DELIMITER);
                 }
+
+                sb.append(words.getId()); //adding line number
 
                 entity.add(new StringLine(words.getId(), sb.toString()));
             }
