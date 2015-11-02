@@ -7,6 +7,7 @@ import thirdparty.filter.DataEnrichmentFilter;
 import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
 
+import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +25,9 @@ public class StringToWordFilter extends DataEnrichmentFilter<StringLine, WordLis
     }
 
     @Override
-    protected boolean fillEntity(StringLine stringLine, WordList entity) {
+    protected boolean fillEntity(StringLine stringLine, WordList entity)  {
+
+
         if (stringLine.getValue() != null) {
             List<Word> words = Stream.of(stringLine.getValue().split(TEXT_SEPARATORS))
                 .map(word -> new Word(stringLine.getId(), word))
@@ -36,6 +39,12 @@ public class StringToWordFilter extends DataEnrichmentFilter<StringLine, WordLis
 
             entity.setId(stringLine.getId());
             entity.setValue(words);
+
+            try {
+                sendEndSignal();
+            } catch (StreamCorruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         return false;

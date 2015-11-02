@@ -6,6 +6,7 @@ import thirdparty.filter.DataEnrichmentFilter;
 import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
 
+import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +39,12 @@ public class WordShiftFilter extends DataEnrichmentFilter<WordList, List<WordLis
                 tempList.addLast(tempWord);
 
                 entity.add(listToWordList(id, tempList));
+            }
+
+            try {
+                sendEndSignal();
+            } catch (StreamCorruptedException e) {
+                e.printStackTrace();
             }
         }
 

@@ -7,10 +7,10 @@ import thirdparty.filter.DataEnrichmentFilter;
 import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
 
+import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by sereGkaluv on 01-Nov-15.
@@ -45,6 +45,12 @@ public class WordsListToStringLineList extends DataEnrichmentFilter<List<WordLis
                 sb.append(words.getId()); //adding line number
 
                 entity.add(new StringLine(words.getId(), sb.toString()));
+            }
+
+            try {
+                sendEndSignal();
+            } catch (StreamCorruptedException e) {
+                e.printStackTrace();
             }
         }
 
