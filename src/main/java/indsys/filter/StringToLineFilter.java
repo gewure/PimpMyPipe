@@ -15,7 +15,7 @@ public class StringToLineFilter implements Readable<StringLine> {
     private final Path _sourceFilePath;
 
     private BufferedReader _br;
-    private int lineIndex = -1;
+    private static int lineIndex = -1;
 
     public StringToLineFilter() {
         this(DEFAULT_SOURCE_FILE_PATH);
@@ -44,7 +44,7 @@ public class StringToLineFilter implements Readable<StringLine> {
             try {
                 String line = _br.readLine();
                 if (line != null) {
-                    return new StringLine(++lineIndex, _br.readLine());
+                    return new StringLine(++lineIndex, line);
                 } else {
                     _br.close();
                     _br = null;

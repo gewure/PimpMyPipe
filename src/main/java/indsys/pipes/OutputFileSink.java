@@ -16,8 +16,10 @@ public class OutputFileSink implements Writable<List<StringLine>>{
     private static final String DEFAULT_OUTPUT_FILE_PATH = "out.txt";
     private final Path _outputFilePath;
 
+    private BufferedWriter _bw;
+
     public OutputFileSink() {
-        _outputFilePath = Paths.get(DEFAULT_OUTPUT_FILE_PATH);
+        this(DEFAULT_OUTPUT_FILE_PATH);
     }
 
     public OutputFileSink(String outputFilePath) {
@@ -26,21 +28,24 @@ public class OutputFileSink implements Writable<List<StringLine>>{
         } else {
             _outputFilePath = Paths.get(DEFAULT_OUTPUT_FILE_PATH);
         }
+
+        try {
+            _bw = Files.newBufferedWriter(_outputFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void write(List<StringLine> sortedList) throws StreamCorruptedException {
-
         try {
-
-            BufferedWriter bw = Files.newBufferedWriter(_outputFilePath);
 
             if (sortedList != null) {
                 for (StringLine stringLine : sortedList) {
-                    bw.write(stringLine.getValue());
+                    _bw.write(stringLine.getValue());
                 }
-
-                bw.close();
+            } else {
+                _bw.close();
             }
 
         } catch (IOException e) {

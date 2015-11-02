@@ -1,2 +1,3 @@
 Kiwis are good.
 Apples are better.
+This is a third sentence.
