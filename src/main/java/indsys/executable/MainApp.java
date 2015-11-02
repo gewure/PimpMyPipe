@@ -34,7 +34,8 @@ public class MainApp {
             new WordShiftFilter(wordPipe, wordShiftedPipe)
         ).start();
 
-        new Thread(new DictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
+        new Thread(
+            new DictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
         ).start();
 
         new Thread(

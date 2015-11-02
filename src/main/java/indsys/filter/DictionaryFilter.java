@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public class DictionaryFilter extends DataTransformationFilter<List<WordList>> {
 
-    public Set<String> dictionary = new HashSet<String>();
+    public Set<String> dictionary = new HashSet<>();
 
     /*
      * constructor
@@ -41,13 +41,13 @@ public class DictionaryFilter extends DataTransformationFilter<List<WordList>> {
             }
 
 
-            for (int i = 0; i < wholeText.size(); i++) { // loop through sentence
-                WordList thisSentence = wholeText.get(i); // get current sentence
-
-                //foreach word in dictionary
+            for (WordList wordList : wholeText) { // loop through sentence, get current sentence
                 // if contains current dictword remove the first word of sentence
-                if (dictionary.contains(thisSentence.getValue().get(0))) {
-                    thisSentence.getValue().remove(0);
+
+                String word =  wordList.getValue().get(0).getValue();
+
+                if (dictionary.contains(word)) {
+                    wordList.getValue().remove(0);
                 }
             }
         }
