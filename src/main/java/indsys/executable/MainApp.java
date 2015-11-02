@@ -26,21 +26,26 @@ public class MainApp {
         BufferedSyncPipe<List<WordList>> dictionaryCleanedPipe = new BufferedSyncPipe<>(4);
         BufferedSyncPipe<List<StringLine>> stringLinePipe = new BufferedSyncPipe<>(4);
 
+        // 1. Text -> List<Sentences>
         new Thread(
             new StringToWordFilter(stringToLineFilter, wordPipe)
         ).start();
 
+        // 2. List<Sentence> -> shifted(List<Sentence>
         new Thread(
             new WordShiftFilter(wordPipe, wordShiftedPipe)
         ).start();
 
+        // 3. shifted(List<Sentence>) -> firstWordCleanedByDictionary(List<Sentence>)
         new Thread(new DictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
         ).start();
 
+        // 4. firstWordCleanedByDictionary(List<Sentence>) -> List<Strings>
         new Thread(
             new WordsListToStringLineList(dictionaryCleanedPipe, stringLinePipe)
         ).start();
 
+        // 5. List<Strings> -> sorted(List<Strings>)
         new Thread(
             new StringListSortFilter(stringLinePipe, outputConsoleSink)
         ).start();
