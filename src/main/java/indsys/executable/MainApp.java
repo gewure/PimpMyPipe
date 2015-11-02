@@ -37,7 +37,8 @@ public class MainApp {
         ).start();
 
         // 3. shifted(List<Sentence>) -> firstWordCleanedByDictionary(List<Sentence>)
-        new Thread(new DictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
+        new Thread(
+            new DictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
         ).start();
 
         // 4. firstWordCleanedByDictionary(List<Sentence>) -> List<Strings>
