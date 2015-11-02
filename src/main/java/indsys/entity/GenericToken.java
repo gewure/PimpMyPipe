@@ -4,8 +4,11 @@ package indsys.entity;
  * Created by sereGkaluv on 01-Nov-15.
  */
 public class GenericToken<T, U> implements IGenericToken<T, U> {
-    protected final T _id;
+    protected T _id;
     protected U _value;
+
+    protected GenericToken() {
+    }
 
     protected GenericToken(T id) {
         _id = id;
@@ -17,6 +20,16 @@ public class GenericToken<T, U> implements IGenericToken<T, U> {
     }
 
     @Override
+    public T getId() {
+        return _id;
+    }
+
+    @Override
+    public void setId(T id) {
+        _id = id;
+    }
+
+    @Override
     public U getValue() {
         return _value;
     }
@@ -24,10 +37,5 @@ public class GenericToken<T, U> implements IGenericToken<T, U> {
     @Override
     public void setValue(U value) {
         _value = value;
-    }
-
-    @Override
-    public T getId() {
-        return _id;
     }
 }

@@ -3,6 +3,7 @@ package indsys.executable;
 import indsys.entity.StringLine;
 import indsys.entity.WordList;
 import indsys.filter.*;
+import indsys.pipes.OutputConsoleSink;
 import indsys.pipes.OutputFileSink;
 import indsys.entity.Word;
 import thirdparty.pipes.BufferedSyncPipe;
@@ -20,8 +21,9 @@ public class MainApp {
     public static void main(String[] args) {
         StringToLineFilter stringToLineFilter = new StringToLineFilter(SOURCE_FILE_PATH);
         OutputFileSink outputFileSink = new OutputFileSink(OUTPUT_FILE_PATH);
+        OutputConsoleSink outputConsoleSink = new OutputConsoleSink();
 
-        BufferedSyncPipe<List<Word>> wordPipe = new BufferedSyncPipe<>(64);
+        BufferedSyncPipe<WordList> wordPipe = new BufferedSyncPipe<>(64);
         BufferedSyncPipe<List<WordList>> wordShiftedPipe = new BufferedSyncPipe<>(4);
         BufferedSyncPipe<List<StringLine>> stringLinePipe = new BufferedSyncPipe<>(4);
 
@@ -38,7 +40,7 @@ public class MainApp {
         ).start();
 
         new Thread(
-            new StringListSortFilter(stringLinePipe, outputFileSink)
+            new StringListSortFilter(stringLinePipe, outputConsoleSink)
         ).start();
     }
 }

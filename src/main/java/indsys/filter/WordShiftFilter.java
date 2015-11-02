@@ -13,27 +13,30 @@ import java.util.List;
 /**
  * Created by sereGkaluv on 01-Nov-15.
  */
-public class WordShiftFilter extends DataEnrichmentFilter<List<Word>, List<WordList>> {
+public class WordShiftFilter extends DataEnrichmentFilter<WordList, List<WordList>> {
 
-    public WordShiftFilter(Readable<List<Word>> input, Writable<List<WordList>> output)
+    public WordShiftFilter(Readable<WordList> input, Writable<List<WordList>> output)
     throws InvalidParameterException {
         super(input, output);
     }
 
     @Override
-    protected boolean fillEntity(List<Word> wordList, List<WordList> entity) {
+    protected boolean fillEntity(WordList wordList, List<WordList> entity) {
         if (wordList != null) {
+            int id = wordList.getId();
+            LinkedList<Word> tempList = new LinkedList<>(wordList.getValue());
 
-            if (wordList.isEmpty()) {
+            if (tempList.isEmpty()) {
                 return true;
             }
 
-            LinkedList<Word> tempList = new LinkedList<>(wordList);
-            for (int shift = 0; shift <= wordList.size(); ++shift) {
+            entity.add(id, wordList);
+
+            for (int shift = 0; shift < tempList.size() - 1; ++shift) {
                 Word tempWord = tempList.removeFirst();
                 tempList.addLast(tempWord);
 
-                entity.add(new WordList(tempWord.getId(), tempList));
+                entity.add(listToWordList(id, tempList));
             }
         }
 
@@ -43,5 +46,9 @@ public class WordShiftFilter extends DataEnrichmentFilter<List<Word>, List<WordL
     @Override
     protected List<WordList> getNewEntityObject() {
         return new LinkedList<>();
+    }
+
+    private WordList listToWordList(int id, List<Word> list) {
+        return new WordList(id, new LinkedList<>(list));
     }
 }

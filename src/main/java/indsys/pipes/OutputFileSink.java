@@ -36,6 +36,8 @@ public class OutputFileSink implements Writable<List<StringLine>>{
                 for (StringLine stringLine : sortedList) {
                     bw.write(stringLine.getValue());
                 }
+
+                bw.close();
             }
 
         } catch (IOException e) {

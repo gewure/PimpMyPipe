@@ -7,6 +7,10 @@ import java.util.List;
  * Created by sereGkaluv on 01-Nov-15.
  */
 public class WordList extends GenericToken<Integer, List<Word>> {
+    public WordList() {
+        super();
+    }
+
     public WordList(Integer lineIndex){
         super(lineIndex);
     }

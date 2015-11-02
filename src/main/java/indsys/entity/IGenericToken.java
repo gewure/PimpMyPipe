@@ -5,6 +5,10 @@ package indsys.entity;
  */
 public interface IGenericToken<T, U> {
     T getId();
+
+    void setId(T id);
+
     U getValue();
+
     void setValue(U value);
 }

@@ -33,11 +33,19 @@ public class WordsListToStringLineList extends DataEnrichmentFilter<List<WordLis
 
             //FIX ME: Out of memory error;
             for(WordList words : wordsList) {
-                String rawString = words.getValue().stream()
-                    .map(Word::getValue)
-                    .collect(Collectors.joining(DELIMITER));
 
-                entity.add(new StringLine(words.getId(), rawString));
+                int wordsListSize = words.getValue().size();
+                StringBuilder sb = new StringBuilder((2 * wordsListSize) - 1);
+
+                for (Word word : words.getValue()) {
+                    sb.append(word.getValue());
+
+                    if (--wordsListSize > 0) {
+                        sb.append(DELIMITER);
+                    }
+                }
+
+                entity.add(new StringLine(words.getId(), sb.toString()));
             }
         }
 
