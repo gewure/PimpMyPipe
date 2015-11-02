@@ -4,7 +4,7 @@ package indsys.entity;
  * Created by sereGkaluv on 01-Nov-15.
  */
 public class GenericToken<T, U> implements IGenericToken<T, U> {
-    protected T _id;
+    protected T _id;  //counts linenumber
     protected U _value;
 
     protected GenericToken() {

@@ -30,7 +30,10 @@ public class OutputFileSink implements Writable<List<StringLine>>{
 
     @Override
     public void write(List<StringLine> sortedList) throws StreamCorruptedException {
-        try (BufferedWriter bw = Files.newBufferedWriter(_outputFilePath)) {
+
+        try {
+
+            BufferedWriter bw = Files.newBufferedWriter(_outputFilePath);
 
             if (sortedList != null) {
                 for (StringLine stringLine : sortedList) {

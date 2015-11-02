@@ -5,7 +5,6 @@ import indsys.entity.WordList;
 import indsys.filter.*;
 import indsys.pipes.OutputConsoleSink;
 import indsys.pipes.OutputFileSink;
-import indsys.entity.Word;
 import thirdparty.pipes.BufferedSyncPipe;
 
 import java.util.List;
@@ -25,6 +24,7 @@ public class MainApp {
 
         BufferedSyncPipe<WordList> wordPipe = new BufferedSyncPipe<>(64);
         BufferedSyncPipe<List<WordList>> wordShiftedPipe = new BufferedSyncPipe<>(4);
+        BufferedSyncPipe<List<WordList>> dictionaryCleanedPipe = new BufferedSyncPipe<>(4);
         BufferedSyncPipe<List<StringLine>> stringLinePipe = new BufferedSyncPipe<>(4);
 
         new Thread(
@@ -35,8 +35,11 @@ public class MainApp {
             new WordShiftFilter(wordPipe, wordShiftedPipe)
         ).start();
 
+        new Thread(new DictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
+        ).start();
+
         new Thread(
-            new WordsListToStringLineList(wordShiftedPipe, stringLinePipe)
+            new WordsListToStringLineList(dictionaryCleanedPipe, stringLinePipe)
         ).start();
 
         new Thread(
