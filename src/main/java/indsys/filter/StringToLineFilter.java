@@ -38,10 +38,8 @@ public class StringToLineFilter implements Readable<StringLine> {
 	@Override
 	public StringLine read() throws StreamCorruptedException {
         if (_br != null) {
-
-
-            //FIX ME: line numbers still are still not working
             try {
+
                 String line = _br.readLine();
                 if (line != null) {
                     return new StringLine(++lineIndex, line);
@@ -54,7 +52,6 @@ public class StringToLineFilter implements Readable<StringLine> {
                 e.printStackTrace();
             }
         }
-
         return null;
     }
 }

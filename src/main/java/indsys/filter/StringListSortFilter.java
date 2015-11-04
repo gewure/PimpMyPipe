@@ -24,11 +24,7 @@ public class StringListSortFilter extends DataTransformationFilter<List<StringLi
 
     @Override
     protected void process(List<StringLine> stringLineList) {
-        if (stringLineList != null) {
-            if (stringLineList.isEmpty()) {
-                return;
-            }
-
+        if (stringLineList != null && !stringLineList.isEmpty()) {
             stringLineList.sort(
                 (l1, l2) -> String.CASE_INSENSITIVE_ORDER.compare(l1.getValue(), l2.getValue())
             );

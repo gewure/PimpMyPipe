@@ -2,12 +2,10 @@ package indsys.filter;
 
 import indsys.entity.StringLine;
 import indsys.entity.Word;
-import indsys.entity.WordList;
 import thirdparty.filter.DataEnrichmentFilter;
 import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
 
-import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,43 +13,39 @@ import java.util.List;
 /**
  * Created by sereGkaluv on 01-Nov-15.
  */
-public class WordsListToStringLineList extends DataEnrichmentFilter<List<WordList>, List<StringLine>> {
+public class WordsListToStringLineList extends DataEnrichmentFilter<List<List<Word>>, List<StringLine>> {
     private static final String DELIMITER = " ";
 
-    public WordsListToStringLineList(Readable<List<WordList>> input, Writable<List<StringLine>> output)
+    public WordsListToStringLineList(Readable<List<List<Word>>> input, Writable<List<StringLine>> output)
     throws InvalidParameterException {
         super(input, output);
     }
 
     @Override
-    protected boolean fillEntity(List<WordList> wordsList, List<StringLine> entity) {
-        if (wordsList != null) {
+    protected boolean fillEntity(List<List<Word>> wordsLists, List<StringLine> entity) {
+        if (wordsLists != null) {
 
-            if (wordsList.isEmpty()) {
+            if (wordsLists.isEmpty()) {
                 return true;
             }
 
-            //FIX ME: Out of memory error;
-            for(WordList words : wordsList) {
+            for(List<Word> wordList : wordsLists) {
 
-                int wordsListSize = words.getValue().size();
-                StringBuilder sb = new StringBuilder((2 * wordsListSize) - 1);
+                int wordListSize = wordList.size();
+                int lineNumber = wordList.get(0).getLineIndex();
+                StringBuilder sb = new StringBuilder((2 * wordListSize) + 1); //words + delimiters + line number
 
-                for (Word word : words.getValue()) {
+                for (Word word : wordList) {
                     sb.append(word.getValue());
                     sb.append(DELIMITER);
                 }
 
-                sb.append(words.getId()); //adding line number
+                sb.append(lineNumber); //adding line number
 
-                entity.add(new StringLine(words.getId(), sb.toString()));
+                entity.add(new StringLine(lineNumber, sb.toString()));
             }
 
-            try {
-                sendEndSignal();
-            } catch (StreamCorruptedException e) {
-                e.printStackTrace();
-            }
+            return true;
         }
 
         return false;

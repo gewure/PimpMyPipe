@@ -20,7 +20,7 @@ public class GenericToken<T, U> implements IGenericToken<T, U> {
     }
 
     @Override
-    public T getId() {
+    public T getLineIndex() {
         return _id;
     }
 

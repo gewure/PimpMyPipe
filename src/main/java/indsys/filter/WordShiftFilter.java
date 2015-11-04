@@ -1,12 +1,10 @@
 package indsys.filter;
 
 import indsys.entity.Word;
-import indsys.entity.WordList;
 import thirdparty.filter.DataEnrichmentFilter;
 import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
 
-import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,49 +12,45 @@ import java.util.List;
 /**
  * Created by sereGkaluv on 01-Nov-15.
  */
-public class WordShiftFilter extends DataEnrichmentFilter<WordList, List<WordList>> {
+public class WordShiftFilter extends DataEnrichmentFilter<List<Word>, List<List<Word>>> {
 
-    public WordShiftFilter(Readable<WordList> input, Writable<List<WordList>> output)
+    public WordShiftFilter(Readable<List<Word>> input, Writable<List<List<Word>>> output)
     throws InvalidParameterException {
         super(input, output);
     }
 
     @Override
-    protected boolean fillEntity(WordList wordList, List<WordList> entity) {
+    protected boolean fillEntity(List<Word> wordList, List<List<Word>> entity) {
         if (wordList != null) {
-            int id = wordList.getId();
-            LinkedList<Word> tempList = new LinkedList<>(wordList.getValue());
+            LinkedList<Word> tempList = (LinkedList<Word>) wordList;
 
             if (tempList.isEmpty()) {
                 return true;
             }
 
-            entity.add(wordList);
+            //saving one iteration
+            entity.add(cloneList(tempList));
 
-            int shiftSteps = tempList.size() - 1;
-            for (int shift = 0; shift < shiftSteps; ++shift) {
+            //shifting iterations
+            for (int shift = 0; shift < tempList.size() - 1; ++shift) {
                 Word tempWord = tempList.removeFirst();
                 tempList.addLast(tempWord);
 
-                entity.add(listToWordList(id, tempList));
+                entity.add(cloneList(tempList));
             }
 
-            try {
-                sendEndSignal();
-            } catch (StreamCorruptedException e) {
-                e.printStackTrace();
-            }
+            return true;
         }
 
         return false;
     }
 
     @Override
-    protected List<WordList> getNewEntityObject() {
+    protected List<List<Word>> getNewEntityObject() {
         return new LinkedList<>();
     }
 
-    private WordList listToWordList(int id, List<Word> list) {
-        return new WordList(id, new LinkedList<>(list));
+    private List<Word> cloneList(List<Word> list) {
+        return new LinkedList<>(list);
     }
 }
