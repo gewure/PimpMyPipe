@@ -15,10 +15,10 @@ import java.util.stream.Stream;
 /**
  * Created by sereGkaluv on 01-Nov-15.
  */
-public class StringToWordFilter extends DataEnrichmentFilter<StringLine, List<Word>> {
+public class LineToWordFilter extends DataEnrichmentFilter<StringLine, List<Word>> {
     private static final String TEXT_SEPARATORS = "[ \\r\\n\\t.,;:'\"()?!]";
 
-    public StringToWordFilter(Readable<StringLine> input, Writable<List<Word>> output)
+    public LineToWordFilter(Readable<StringLine> input, Writable<List<Word>> output)
     throws InvalidParameterException {
         super(input, output);
     }

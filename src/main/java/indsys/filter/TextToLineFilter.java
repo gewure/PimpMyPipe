@@ -10,18 +10,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class StringToLineFilter implements Readable<StringLine> {
+public class TextToLineFilter implements Readable<StringLine> {
     private static final String DEFAULT_SOURCE_FILE_PATH = "in.txt";
-    private final Path _sourceFilePath;
 
     private BufferedReader _br;
     private static int lineIndex = -1;
 
-    public StringToLineFilter() {
+    public TextToLineFilter() {
         this(DEFAULT_SOURCE_FILE_PATH);
     }
 
-    public StringToLineFilter(String sourceFilePath) {
+    public TextToLineFilter(String sourceFilePath) {
+        Path _sourceFilePath;
+
         if(sourceFilePath != null) {
             _sourceFilePath = Paths.get(sourceFilePath);
         } else {

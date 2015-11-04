@@ -18,7 +18,7 @@ public class MainApp {
     private static final String OUTPUT_FILE_PATH = "out.txt";
 
     public static void main(String[] args) {
-        StringToLineFilter stringToLineFilter = new StringToLineFilter(SOURCE_FILE_PATH);
+        TextToLineFilter textToLineFilter = new TextToLineFilter(SOURCE_FILE_PATH);
 
         BufferedSyncPipe<List<Word>> wordPipe = new BufferedSyncPipe<>(BUFFER_SIZE * BUFFER_SIZE);
         BufferedSyncPipe<List<List<Word>>> wordShiftedPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
@@ -32,7 +32,7 @@ public class MainApp {
 
         // 1. Text -> List<Sentences> -> List<Word>
         new Thread(
-            new StringToWordFilter(stringToLineFilter, wordPipe)
+            new LineToWordFilter(textToLineFilter, wordPipe)
         ).start();
 
         // 2. List<Word> -> Shifted (List<Word>)
@@ -42,17 +42,17 @@ public class MainApp {
 
         // 3. Shifted (List<Word>) -> Filtered with Dictionary (List<Word>)
         new Thread(
-            new DictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
+            new WordDictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
         ).start();
 
         // 4. Filtered with Dictionary (List<Word>) -> List<StringLine>
         new Thread(
-            new WordsListToStringLineList(dictionaryCleanedPipe, stringLinePipe)
+            new WordsToLineFilter(dictionaryCleanedPipe, stringLinePipe)
         ).start();
 
         // 5. List<StringLine> -> Sorted alphabetically (List<StringLine>) -> Sink
         new Thread(
-            new StringListSortFilter(stringLinePipe, outputFileSink)
+            new LineSortFilter(stringLinePipe, outputFileSink)
         ).start();
     }
 }

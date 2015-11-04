@@ -3,7 +3,9 @@ package indsys.pipes;
 import indsys.entity.StringLine;
 import thirdparty.interfaces.Writable;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.StreamCorruptedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +16,6 @@ import java.util.List;
  */
 public class OutputFileSink implements Writable<List<StringLine>>{
     private static final String DEFAULT_OUTPUT_FILE_PATH = "out.txt";
-    private final Path _outputFilePath;
 
     private BufferedWriter _bw;
 
@@ -23,6 +24,8 @@ public class OutputFileSink implements Writable<List<StringLine>>{
     }
 
     public OutputFileSink(String outputFilePath) {
+        Path _outputFilePath;
+
         if(outputFilePath != null) {
             _outputFilePath = Paths.get(outputFilePath);
         } else {
@@ -41,10 +44,13 @@ public class OutputFileSink implements Writable<List<StringLine>>{
         try {
 
             if (sortedList != null) {
+
                 for (StringLine stringLine : sortedList) {
                     _bw.write(stringLine.getValue() + "\n");
                 }
+
                 _bw.flush();
+
             } else {
                 _bw.close();
             }

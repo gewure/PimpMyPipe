@@ -13,10 +13,10 @@ import java.util.List;
 /**
  * Created by sereGkaluv on 01-Nov-15.
  */
-public class WordsListToStringLineList extends DataEnrichmentFilter<List<List<Word>>, List<StringLine>> {
+public class WordsToLineFilter extends DataEnrichmentFilter<List<List<Word>>, List<StringLine>> {
     private static final String DELIMITER = " ";
 
-    public WordsListToStringLineList(Readable<List<List<Word>>> input, Writable<List<StringLine>> output)
+    public WordsToLineFilter(Readable<List<List<Word>>> input, Writable<List<StringLine>> output)
     throws InvalidParameterException {
         super(input, output);
     }
