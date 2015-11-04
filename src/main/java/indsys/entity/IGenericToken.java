@@ -6,7 +6,7 @@ package indsys.entity;
 public interface IGenericToken<T, U> {
     T getLineIndex();
 
-    void setId(T id);
+    void setLineIndex(T id);
 
     U getValue();
 

@@ -25,7 +25,7 @@ public class GenericToken<T, U> implements IGenericToken<T, U> {
     }
 
     @Override
-    public void setId(T id) {
+    public void setLineIndex(T id) {
         _id = id;
     }
 

@@ -8,6 +8,8 @@ import java.util.List;
 
 /**
  * Created by sereGkaluv on 01-Nov-15.
+ *
+ * Alternative Sink.
  */
 public class OutputConsoleSink implements Writable<List<StringLine>>{
     public OutputConsoleSink() {

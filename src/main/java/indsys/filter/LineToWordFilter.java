@@ -26,8 +26,7 @@ public class LineToWordFilter extends DataEnrichmentFilter<StringLine, List<Word
     @Override
     protected boolean fillEntity(StringLine stringLine, List<Word> entity)  {
 
-
-        if (stringLine.getValue() != null) {
+        if (stringLine != null && stringLine.getValue() != null) {
             List<Word> words = Stream.of(stringLine.getValue().split(TEXT_SEPARATORS))
                 .map(word -> new Word(stringLine.getLineIndex(), word))
                 .collect(Collectors.toList());
