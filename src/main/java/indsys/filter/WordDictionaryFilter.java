@@ -27,7 +27,7 @@ public class WordDictionaryFilter extends DataTransformationFilter<List<List<Wor
         super(input, output);
 
         // adding the 'useless' words to the DICTIONARY
-        loadDictionary(DEFAULT_DICT_FILE_PATH);
+        loadDictionaryFromFile(DEFAULT_DICT_FILE_PATH);
     }
 
     public WordDictionaryFilter(Readable<List<List<Word>>> input, Writable<List<List<Word>>> output, String pathToDict)
@@ -35,7 +35,7 @@ public class WordDictionaryFilter extends DataTransformationFilter<List<List<Wor
         super(input, output);
 
         // adding the 'useless' words to the DICTIONARY
-        loadDictionary(pathToDict);
+        loadDictionaryFromFile(pathToDict);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class WordDictionaryFilter extends DataTransformationFilter<List<List<Wor
         }
     }
 
-    private static void loadDictionary(String pathToDict){
+    private static void loadDictionaryFromFile(String pathToDict){
         try (BufferedReader br = Files.newBufferedReader(Paths.get(pathToDict))) {
 
             for (String line = br.readLine(); line != null; line = br.readLine()) {
