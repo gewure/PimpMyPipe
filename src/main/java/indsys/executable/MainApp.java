@@ -25,17 +25,17 @@ public class MainApp {
 
     public static void main(String[] args) {
         /* TASK A */
-//        TextToLineFilter textToLineFilter = new TextToLineFilter(SOURCE_SHORT_FILE_PATH);
-//        OutputFileSink aOutputFileSink = new OutputFileSink(INDEX_OUTPUT_FILE_PATH);
+        TextToLineFilter textToLineFilter = new TextToLineFilter(SOURCE_SHORT_FILE_PATH);
+        OutputFileSink aOutputFileSink = new OutputFileSink(INDEX_OUTPUT_FILE_PATH);
 
-//        runTaskA(textToLineFilter, aOutputFileSink);
+        runTaskA(textToLineFilter, aOutputFileSink);
 
 
         /* TASK B */
         TextToCharFilter textToCharFilter = new TextToCharFilter(SOURCE_CHAR_FILE_PATH);
         OutputFileSink bOutputFileSink = new OutputFileSink(INDEX_OUTPUT_FILE_PATH);
 
-        runTaskB(textToCharFilter, bOutputFileSink, TextAlignment.CENTERED, 30);
+        runTaskB(textToCharFilter, bOutputFileSink, TextAlignment.NONE, 30);
     }
 
     private static void runTaskA(Readable<StringLine> sourceStream, Writable<List<StringLine>> outputSink) {

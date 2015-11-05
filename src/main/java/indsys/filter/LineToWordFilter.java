@@ -27,16 +27,16 @@ public class LineToWordFilter extends DataEnrichmentFilter<StringLine, List<Word
     protected boolean fillEntity(StringLine stringLine, List<Word> entity)  {
 
         if (stringLine != null && stringLine.getValue() != null) {
-            List<Word> words = Stream.of(stringLine.getValue().split(TEXT_SEPARATORS))
-                .map(word -> new Word(stringLine.getLineIndex(), word))
-                .collect(Collectors.toList());
 
-            if(words.isEmpty()) {
-                return true;
+            for (String word : stringLine.getValue().split(TEXT_SEPARATORS)) {
+                String trimmedWord = word.trim();
+
+                if (!trimmedWord.isEmpty()) {
+                    entity.add(new Word(stringLine.getLineIndex(), trimmedWord));
+                }
             }
 
-            entity.addAll(words);
-            return true;
+            if (!entity.isEmpty()) return true;
         }
 
         return false;
