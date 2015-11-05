@@ -35,7 +35,7 @@ public class MainApp {
         TextToCharFilter textToCharFilter = new TextToCharFilter(SOURCE_CHAR_FILE_PATH);
         OutputFileSink bOutputFileSink = new OutputFileSink(INDEX_OUTPUT_FILE_PATH);
 
-        runTaskB(textToCharFilter, bOutputFileSink, TextAlignment.CENTERED, 1);
+        runTaskB(textToCharFilter, bOutputFileSink, TextAlignment.CENTERED, 30);
     }
 
     private static void runTaskA(Readable<StringLine> sourceStream, Writable<List<StringLine>> outputSink) {

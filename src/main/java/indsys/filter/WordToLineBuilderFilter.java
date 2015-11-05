@@ -58,7 +58,7 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
             int wordLength = word.getValue().length();
 
             //if word is bigger than line length simply push it
-            if (wordLength > _lineLength) {
+            if (wordLength >= _lineLength) {
                 //just append one word (line should contain at least one word)
                 //setting value of the entity (preparing for push)
                 setEntityValues(entity, word.getValue());
