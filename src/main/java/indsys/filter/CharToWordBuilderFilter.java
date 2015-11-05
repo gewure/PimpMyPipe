@@ -7,13 +7,14 @@ import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
 
 import java.security.InvalidParameterException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by sereGkaluv on 04-Nov-15.
  */
 public class CharToWordBuilderFilter extends DataEnrichmentFilter<Char, Word> {
-    private static final String TEXT_SEPARATORS = "[ \\r\\n\\t.,;:'\"()?!]";
+    private static final String TEXT_SEPARATORS = "[ \r\n\t.,;:'\"()?!]";
     private static final Set<Character> SEPARATORS_SET = new HashSet<>();
 
     private Character _lastCharacter;
@@ -38,16 +39,18 @@ public class CharToWordBuilderFilter extends DataEnrichmentFilter<Char, Word> {
                     _sb = new StringBuilder();
                 }
 
-                _sb.append(ch);
+                if (!SEPARATORS_SET.contains(ch)) {
 
-                if (SEPARATORS_SET.contains(ch)) {
-                    entity.setValue(_sb.toString().trim());
+                    _sb.append(ch);
+                    return false;
+
+                } else if (_sb.length() > 0) {
+
+                    entity.setValue(_sb.toString());
 
                     _sb = null;
                     return true;
                 }
-
-                return false;
 
             } else if (_sb != null) {
                 entity.setValue(_sb.toString());

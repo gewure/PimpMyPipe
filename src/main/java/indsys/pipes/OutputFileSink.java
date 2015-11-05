@@ -17,6 +17,7 @@ import java.util.List;
 public class OutputFileSink implements Writable<List<StringLine>>{
     private static final String DEFAULT_OUTPUT_FILE_PATH = "out.txt";
 
+    private Path _outputFilePath;
     private BufferedWriter _bw;
 
     public OutputFileSink() {
@@ -24,7 +25,6 @@ public class OutputFileSink implements Writable<List<StringLine>>{
     }
 
     public OutputFileSink(String outputFilePath) {
-        Path _outputFilePath;
 
         if(outputFilePath != null) {
             _outputFilePath = Paths.get(outputFilePath);
@@ -41,22 +41,28 @@ public class OutputFileSink implements Writable<List<StringLine>>{
 
     @Override
     public void write(List<StringLine> sortedList) throws StreamCorruptedException {
-        try {
+        if(_bw != null) {
 
-            if (sortedList != null) {
+            try {
 
-                for (StringLine stringLine : sortedList) {
-                    _bw.write(stringLine.getValue() + "\n");
+                if (sortedList != null) {
+
+                    for (StringLine stringLine : sortedList) {
+                        _bw.write(stringLine.getValue() + "\n");
+                    }
+
+                    _bw.flush();
+
+                } else {
+                    _bw.close();
+                    _bw = null;
+
+                    System.out.println("Output file \"" + _outputFilePath.getFileName() + "\" was updated.");
                 }
 
-                _bw.flush();
-
-            } else {
-                _bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

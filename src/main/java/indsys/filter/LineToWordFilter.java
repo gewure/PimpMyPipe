@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  * Created by sereGkaluv on 01-Nov-15.
  */
 public class LineToWordFilter extends DataEnrichmentFilter<StringLine, List<Word>> {
-    private static final String TEXT_SEPARATORS = "[ \\r\\n\\t.,;:'\"()?!]";
+    private static final String TEXT_SEPARATORS = "[ \r\n\t.,;:'\"()?!]";
 
     public LineToWordFilter(Readable<StringLine> input, Writable<List<Word>> output)
     throws InvalidParameterException {

@@ -56,7 +56,6 @@ public abstract class DataTransformationFilter<T> extends AbstractFilter<T,T> {
             }while(input != null);
             sendEndSignal();
         } catch (StreamCorruptedException e) {
-            // TODO Automatisch erstellter Catch-Block
             e.printStackTrace();
         }
     }

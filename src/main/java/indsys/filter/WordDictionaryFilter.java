@@ -1,6 +1,7 @@
 package indsys.filter;
 
 import indsys.entity.Word;
+import thirdparty.filter.DataEnrichmentFilter;
 import thirdparty.filter.DataTransformationFilter;
 import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
@@ -11,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -18,12 +20,12 @@ import java.util.Set;
  * Filters a List of sentence of words for the first word and if it is contained in the Set<String> DICTIONARY
  * it is removed from the sentence
  */
-public class WordDictionaryFilter extends DataTransformationFilter<List<List<Word>>> {
+public class WordDictionaryFilter extends DataEnrichmentFilter<List<List<Word>>, List<List<Word>>> {
     private static final String DEFAULT_DICT_FILE_PATH = "dict.txt";
     public static final Set<String> DICTIONARY = new HashSet<>();
 
     public WordDictionaryFilter(Readable<List<List<Word>>> input, Writable<List<List<Word>>> output)
-            throws InvalidParameterException {
+    throws InvalidParameterException {
         super(input, output);
 
         // adding the 'useless' words to the DICTIONARY
@@ -39,7 +41,7 @@ public class WordDictionaryFilter extends DataTransformationFilter<List<List<Wor
     }
 
     @Override
-    protected void process(List<List<Word>> wordLists) {
+    protected boolean fillEntity(List<List<Word>> wordLists, List<List<Word>> entity) {
         if (wordLists != null && !wordLists.isEmpty()) {
 
             for (List<Word> wordList : wordLists) { // loop through sentence, get current sentence
@@ -49,8 +51,24 @@ public class WordDictionaryFilter extends DataTransformationFilter<List<List<Wor
                 if (DICTIONARY.contains(word)) {
                     wordList.remove(0);
                 }
+
+                //check if current line is not empty
+                if (!wordList.isEmpty()) {
+                    entity.add(wordList);
+                }
+            }
+
+            //check if the whole list is not empty
+            if (!entity.isEmpty()) {
+                return true;
             }
         }
+        return false;
+    }
+
+    @Override
+    protected List<List<Word>> getNewEntityObject() {
+        return new LinkedList<>();
     }
 
     private static void loadDictionaryFromFile(String pathToDict){

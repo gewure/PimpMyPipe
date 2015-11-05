@@ -14,8 +14,7 @@ public class RemotePipeProxy<T> implements IOable<T, T>{
         try {
             m_RemotePipe = (RemoteIOable)Naming.lookup("rmi://" + remoteAdr  + remotePipeName);
         } catch (Exception e) {
-            // TODO Automatisch erstellter Catch-Block
-            e.printStackTrace();           
+            e.printStackTrace();
         }
     }
     

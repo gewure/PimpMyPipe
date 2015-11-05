@@ -79,7 +79,7 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
                 } else {
                     //produced line length is not acceptable pushing buffer and buffering current (new) word
 
-                    int difference = producedLineLength - _lineLength;
+                    int difference = _lineLength - _sb.length();
 
                     //formatting and writing old buffered value, preparing entity values for push
                     setEntityValues(
@@ -159,6 +159,6 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
     }
 
     private String getPaddingString(int length) {
-        return length != 0 ? String.format("%0" + length + "d", 0).replaceAll("0", " ") : "";
+        return length != 0 ? new String(new char[length]).replace('\0', ' ') : "";
     }
 }
