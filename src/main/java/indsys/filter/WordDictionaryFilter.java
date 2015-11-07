@@ -77,7 +77,6 @@ public class WordDictionaryFilter extends DataEnrichmentFilter<List<List<Word>>,
             for (String line = br.readLine(); line != null; line = br.readLine()) {
                 DICTIONARY.add(line);
             }
-            br.close();
 
         } catch (IOException e) {
             System.out.println(
