@@ -44,9 +44,9 @@ public class WordDictionaryFilter extends DataEnrichmentFilter<List<List<Word>>,
     protected boolean fillEntity(List<List<Word>> wordLists, List<List<Word>> entity) {
         if (wordLists != null && !wordLists.isEmpty()) {
 
-            for (List<Word> wordList : wordLists) { // loop through sentence, get current sentence
-                // if contains current dictword remove the first word of sentence
+            for (List<Word> wordList : wordLists) { // loop through word lists, get current list (line)
 
+                // if the first word is present in the dictionary - remove it from line
                 String word =  wordList.get(0).getValue();
                 if (DICTIONARY.contains(word)) {
                     wordList.remove(0);
