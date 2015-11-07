@@ -46,14 +46,11 @@ public class WordDictionaryFilter extends DataEnrichmentFilter<List<List<Word>>,
 
             for (List<Word> wordList : wordLists) { // loop through word lists, get current list (line)
 
-                // if the first word is present in the dictionary - remove it from line
-                String word =  wordList.get(0).getValue();
-                if (DICTIONARY.contains(word)) {
-                    wordList.remove(0);
-                }
+                // if the first word and following words are present in the dictionary - remove them from line
+                wordList = sanitizeWordList(wordList);
 
                 //check if current line is not empty
-                if (!wordList.isEmpty()) {
+                if (wordList != null && !wordList.isEmpty()) {
                     entity.add(wordList);
                 }
             }
@@ -69,6 +66,21 @@ public class WordDictionaryFilter extends DataEnrichmentFilter<List<List<Word>>,
     @Override
     protected List<List<Word>> getNewEntityObject() {
         return new LinkedList<>();
+    }
+
+    private List<Word> sanitizeWordList(List<Word> wordList) {
+        List<Word> sanitizedList = new LinkedList<>(wordList);
+
+        for (Word word : wordList) {
+            if (DICTIONARY.contains(word.getValue())){
+                //removing first useless word occurrence in the sanitized list.
+                sanitizedList.remove(word);
+            } else {
+                //word list is sanitized (there are no useless words on the beginning of the line)
+                return sanitizedList;
+            }
+        }
+        return null;
     }
 
     private static void loadDictionaryFromFile(String pathToDict){
