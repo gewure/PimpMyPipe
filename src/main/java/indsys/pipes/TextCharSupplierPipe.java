@@ -1,4 +1,4 @@
-package indsys.filter;
+package indsys.pipes;
 
 import indsys.entity.Char;
 import thirdparty.interfaces.Readable;
@@ -10,20 +10,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Created by sereGkaluv on 04-Nov-15.
- */
-public class TextToCharFilter implements Readable<Char> {
+public class TextCharSupplierPipe implements Readable<Char> {
     private static final String DEFAULT_SOURCE_FILE_PATH = "in.txt";
 
     private InputStream _is;
-    private static int charIndex = -1;
 
-    public TextToCharFilter() {
+    public TextCharSupplierPipe() {
         this(DEFAULT_SOURCE_FILE_PATH);
     }
 
-    public TextToCharFilter(String sourceFilePath) {
+    public TextCharSupplierPipe(String sourceFilePath) {
         Path _sourceFilePath;
 
         if (sourceFilePath != null) {
@@ -47,10 +43,14 @@ public class TextToCharFilter implements Readable<Char> {
 
                 int r = _is.read();
                 if (r != -1) {
-                    return new Char(++charIndex, (char) r);
+                    Char c = new Char();
+                    c.setValue((char) r);
+                    return c;
                 } else {
                     _is.close();
                     _is = null;
+
+                    return new Char(); // stop signal
                 }
 
             } catch (Exception e) {

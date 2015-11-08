@@ -5,7 +5,10 @@ import indsys.entity.StringLine;
 import indsys.entity.TextAlignment;
 import indsys.entity.Word;
 import indsys.filter.*;
-import indsys.pipes.OutputFileSink;
+import indsys.pipes.GenericSplitPipe;
+import indsys.pipes.StringLineFileSink;
+import indsys.pipes.StringLinesFileSink;
+import indsys.pipes.TextCharSupplierPipe;
 import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
 import thirdparty.pipes.BufferedSyncPipe;
@@ -25,82 +28,104 @@ public class MainApp {
 
     public static void main(String[] args) {
         /* TASK A */
-        TextToLineFilter textToLineFilter = new TextToLineFilter(SOURCE_SHORT_FILE_PATH);
-        OutputFileSink aOutputFileSink = new OutputFileSink(INDEX_OUTPUT_FILE_PATH);
+        StringLinesFileSink aOutputFileSink = new StringLinesFileSink(INDEX_OUTPUT_FILE_PATH);
 
-        runTaskA(textToLineFilter, aOutputFileSink);
+        runTaskAPush(SOURCE_SHORT_FILE_PATH, aOutputFileSink);
 
 
         /* TASK B */
-        TextToCharFilter textToCharFilter = new TextToCharFilter(SOURCE_CHAR_FILE_PATH);
-        OutputFileSink bOutputFileSink = new OutputFileSink(INDEX_OUTPUT_FILE_PATH);
+        TextCharSupplierPipe textCharSupplierPipe = new TextCharSupplierPipe(SOURCE_CHAR_FILE_PATH);
+        StringLineFileSink bFormattedOutputFileSink = new StringLineFileSink(FORMATTED_OUTPUT_FILE_PATH);
+        StringLinesFileSink bIndexOutputFileSink = new StringLinesFileSink(INDEX_OUTPUT_FILE_PATH);
 
-        runTaskB(textToCharFilter, bOutputFileSink, TextAlignment.NONE, 30);
+        runTaskB(textCharSupplierPipe, bFormattedOutputFileSink, bIndexOutputFileSink, TextAlignment.CENTERED, 30);
     }
 
-    private static void runTaskA(Readable<StringLine> sourceStream, Writable<List<StringLine>> outputSink) {
+    private static void runTaskAPull(Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
+
+        BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
+
+        // 1. String (PULL) -> StringLine
+        new Thread(
+            new LineIndexFilter(input, stringLinePipe)
+        ).start();
+
+        runTaskA(stringLinePipe, outputSink);
+    }
+
+    private static void runTaskAPush(String sourceFilePath, Writable<List<StringLine>> outputSink) {
+
+        BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
+
+        // 1. Source (PUSH) -> StringLine
+        new Thread(
+                new LineIndexFilter(sourceFilePath, stringLinePipe)
+        ).start();
+
+        runTaskA(stringLinePipe, outputSink);
+    }
+
+    private static void runTaskA(Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<List<Word>> wordPipe = new BufferedSyncPipe<>(BUFFER_SIZE * BUFFER_SIZE);
         BufferedSyncPipe<List<List<Word>>> wordShiftedPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
         BufferedSyncPipe<List<List<Word>>> dictionaryCleanedPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
-        BufferedSyncPipe<List<StringLine>> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
+        BufferedSyncPipe<List<StringLine>> sortedLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
 
-        // 1. sourceStream -> List<StringLine> -> List<Word>
+        // 2. StringLine -> List<Word>
         new Thread(
-            new LineToWordFilter(sourceStream, wordPipe)
+            new LineToWordFilter(input, wordPipe)
         ).start();
 
-        // 2. List<Word> -> Shifted (List<Word>)
+        // 3. List<Word> -> Shifted (List<Word>)
         new Thread(
             new WordShiftFilter(wordPipe, wordShiftedPipe)
         ).start();
 
-        // 3. Shifted (List<Word>) -> Filtered with Dictionary (List<Word>)
+        // 4. Shifted (List<Word>) -> Filtered with Dictionary (List<Word>)
         new Thread(
             new WordDictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
         ).start();
 
-        // 4. Filtered with Dictionary (List<Word>) -> List<StringLine>
+        // 5. Filtered with Dictionary (List<Word>) -> List<StringLine>
         new Thread(
-            new WordsToLineFilter(dictionaryCleanedPipe, stringLinePipe)
+            new WordsToLinesFilter(dictionaryCleanedPipe, sortedLinePipe)
         ).start();
 
-        // 5. List<StringLine> -> Sorted alphabetically (List<StringLine>) -> outputSink
+        // 6. List<StringLine> -> Sorted alphabetically (List<StringLine>) -> outputSink
         new Thread(
-            new LineSortFilter(stringLinePipe, outputSink)
+            new LineSortFilter(sortedLinePipe, outputSink)
         ).start();
     }
 
     private static void runTaskB(
-        Readable<Char> sourceStream,
+        Readable<Char> charPipe,
+        Writable<StringLine> formattedOutputSink,
         Writable<List<StringLine>> indexOutputSink,
         TextAlignment textAlignment,
         int lineLength
     ) {
 
         BufferedSyncPipe<Word> wordPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
-        BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
-        BufferedSyncPipe<StringLine> secondStreamLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
+        BufferedSyncPipe<StringLine> splitPipe = new GenericSplitPipe<>(BUFFER_SIZE, formattedOutputSink);
 
-        // 1. sourceStream -> Char -> Word
+        // 1. Source (PULL) Char -> Word
         new Thread(
-            new CharToWordBuilderFilter(sourceStream, wordPipe)
+            new CharToWordBuilderFilter(charPipe, wordPipe)
         ).start();
 
         // 2. Word -> StringLine
         new Thread(
-            new WordToLineBuilderFilter(wordPipe, stringLinePipe, textAlignment, lineLength)
+            new WordToLineBuilderFilter(wordPipe, splitPipe, textAlignment, lineLength)
         ).start();
 
-        // 3. StringLine
-        //     ├──> Output File
+        // 3. StringLine (split pipe)
+        //     ├──> 4.1. Output File Sink
         //     │
-        //     └──> Delegation to Task A (indexing)
-        new Thread(
-            new WritingSplitFilter(stringLinePipe, secondStreamLinePipe, FORMATTED_OUTPUT_FILE_PATH)
-        ).start();
-
-        // 4. Delegation to Task A (indexing)
-        runTaskA(secondStreamLinePipe, indexOutputSink);
+        //     └──> 4.2. StringLine -> Delegation to Task A (indexing) (PULL)
+        //
+        //
+        // 4. Delegation to Task A (indexing) (PULL)
+        runTaskAPull(splitPipe, indexOutputSink);
     }
 }

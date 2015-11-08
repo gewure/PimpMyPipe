@@ -14,64 +14,45 @@ import java.util.Set;
  * Created by sereGkaluv on 04-Nov-15.
  */
 public class CharToWordBuilderFilter extends DataEnrichmentFilter<Char, Word> {
-    private static final String TEXT_SEPARATORS = "[ \r\n\t.,;:'\"()?!]";
-    private static final Set<Character> SEPARATORS_SET = new HashSet<>();
+    private static final String END_WORD_INDICATORS = "  \r\n\t";
+    private static final Set<Character> END_WORD_INDICATORS_SET = new HashSet<>();
 
-    private Character _lastCharacter;
     private StringBuilder _sb;
 
     public CharToWordBuilderFilter(Readable<Char> input, Writable<Word> output)
     throws InvalidParameterException {
         super(input, output);
 
-        prepareSeparatorsSet(TEXT_SEPARATORS);
+        prepareEndWordIndicatorsSet(END_WORD_INDICATORS);
     }
 
     @Override
     protected boolean fillEntity(Char character, Word entity) {
-        if (character != null) {
+        if (isBufferEmpty() && isCharEmpty(character)) return true; //nothing to do here
 
-            Character ch = character.getValue();
+        if (isBufferEmpty() && !isCharEmpty(character) && !isEndWordIndicator(character)) {
+            createNewBuffer(character);
+            return false;
+        }
 
-            if (ch != null && !createsSequenceOfSeparators(ch)) {
+        if (!isBufferEmpty() && !isCharEmpty(character)) {
 
-                if (_sb == null) {
-                    _sb = new StringBuilder();
-                }
+            if (isEndWordIndicator(character)) {
 
-                if (!SEPARATORS_SET.contains(ch)) {
-
-                    _sb.append(ch);
-                    return false;
-
-                } else if (_sb.length() > 0) {
-
-                    entity.setValue(_sb.toString());
-
-                    _sb = null;
-                    return true;
-                }
-
-            } else if (_sb != null) {
-                entity.setValue(_sb.toString());
-
-                _sb = null;
+                flushBuffer(entity);
                 return true;
+
+            } else {
+                appendCharToBuffer(character);
+                return false;
             }
         }
 
-        return false;
-    }
-
-    private boolean createsSequenceOfSeparators(Character ch) {
-        if (_lastCharacter != null && SEPARATORS_SET.contains(_lastCharacter)) {
-            //probably a sequence
-
-            _lastCharacter = ch;
-            return SEPARATORS_SET.contains(ch);
+        if (!isBufferEmpty() && isCharEmpty(character)) {
+            flushBuffer(entity);
+            return true;
         }
 
-        _lastCharacter = ch;
         return false;
     }
 
@@ -80,7 +61,35 @@ public class CharToWordBuilderFilter extends DataEnrichmentFilter<Char, Word> {
         return new Word();
     }
 
-    private static void prepareSeparatorsSet(String separators) {
-        separators.chars().forEach(c -> SEPARATORS_SET.add((char) c));
+    private boolean isBufferEmpty() {
+        return _sb == null || _sb.length() == 0;
+    }
+
+    private boolean isCharEmpty(Char character) {
+        return character == null || character.getValue() == null;
+    }
+
+    private void createNewBuffer(Char character) {
+        _sb = new StringBuilder();
+
+        appendCharToBuffer(character);
+    }
+
+    private void appendCharToBuffer(Char character) {
+        _sb.append(character.getValue());
+    }
+
+    private void flushBuffer(Word entity) {
+        entity.setValue(_sb.toString());
+
+        _sb = null;
+    }
+
+    private boolean isEndWordIndicator(Char character) {
+        return END_WORD_INDICATORS_SET.contains(character.getValue());
+    }
+
+    private static void prepareEndWordIndicatorsSet(String separators) {
+        separators.chars().forEach(c -> END_WORD_INDICATORS_SET.add((char) c));
     }
 }

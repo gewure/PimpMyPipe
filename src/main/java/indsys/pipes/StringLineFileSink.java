@@ -1,42 +1,29 @@
-package indsys.filter;
+package indsys.pipes;
 
 import indsys.entity.StringLine;
-import thirdparty.filter.DataTransformationFilter;
-import thirdparty.interfaces.Readable;
 import thirdparty.interfaces.Writable;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.StreamCorruptedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.InvalidParameterException;
 
 /**
- * Created by sereGkaluv on 05-Nov-15.
+ * Created by sereGkaluv on 01-Nov-15.
  */
-public class WritingSplitFilter extends DataTransformationFilter<StringLine> {
-    private static final String DEFAULT_OUTPUT_FILE_PATH = "split_out.txt";
+public class StringLineFileSink implements Writable<StringLine>{
+    private static final String DEFAULT_OUTPUT_FILE_PATH = "out.txt";
 
     private Path _outputFilePath;
     private BufferedWriter _bw;
 
-    public WritingSplitFilter(Readable<StringLine> input, Writable<StringLine> output)
-    throws InvalidParameterException {
-        super(input, output);
-
-        _outputFilePath = Paths.get(DEFAULT_OUTPUT_FILE_PATH);
-
-        try {
-            _bw = Files.newBufferedWriter(_outputFilePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public StringLineFileSink() {
+        this(DEFAULT_OUTPUT_FILE_PATH);
     }
 
-    public WritingSplitFilter(Readable<StringLine> input, Writable<StringLine> output, String outputFilePath)
-    throws InvalidParameterException {
-        super(input, output);
+    public StringLineFileSink(String outputFilePath) {
 
         if(outputFilePath != null) {
             _outputFilePath = Paths.get(outputFilePath);
@@ -52,9 +39,11 @@ public class WritingSplitFilter extends DataTransformationFilter<StringLine> {
     }
 
     @Override
-    protected void process(StringLine stringLine) {
-        try {
-            if (_bw != null) {
+    public void write(StringLine stringLine) throws StreamCorruptedException {
+        if(_bw != null) {
+
+            try {
+
                 if (stringLine != null && stringLine.getValue() != null) {
 
                     _bw.write(stringLine.getValue() + "\n");
@@ -66,9 +55,10 @@ public class WritingSplitFilter extends DataTransformationFilter<StringLine> {
 
                     System.out.println("Output file \"" + _outputFilePath.getFileName() + "\" was updated.");
                 }
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

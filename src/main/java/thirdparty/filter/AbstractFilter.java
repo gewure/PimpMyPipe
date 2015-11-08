@@ -27,7 +27,7 @@ public abstract class AbstractFilter<in, out> implements IOable<in, out>, Runnab
         }
         m_Output = output;
     }
-    
+
     public AbstractFilter(Readable<in> input, Writable<out> output)throws InvalidParameterException{
         if (input == null){
             throw new InvalidParameterException("input can't be null!");

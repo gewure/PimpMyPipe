@@ -31,79 +31,31 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
 
     @Override
     protected boolean fillEntity(Word word, StringLine entity) {
+        if (isBufferEmpty() && isWordEmpty(word)) return true; //nothing to do here
 
-        if (word == null && _sb == null) {
-            //nothing to do here
-            return true;
+        if (isBufferEmpty() && !isWordEmpty(word)) {
+            createNewBuffer(word);
+            return false;
         }
 
-        //pushing buffered words
-        if (_sb != null && _sb.length() > _lineLength){
-            //setting buffered word as a value of the entity (preparing for push)
-            setEntityValues(entity, _sb.toString());
+        if (!isBufferEmpty() && !isWordEmpty(word)) {
 
-            //buffering new word
-            if (word != null) bufferWord(word.getValue());
+            if (isBufferFull() || !isEnoughBufferSpaceForWord(word)) {
 
-            return true;
-        }
-
-        //normal approach
-        if (word != null) {
-
-            if (word.getValue() == null) {
+                flushBuffer(entity);
+                createNewBuffer(word);
                 return true;
-            }
 
-            int wordLength = word.getValue().length();
-
-            //if word is bigger than line length simply push it
-            if (wordLength >= _lineLength) {
-                //just append one word (line should contain at least one word)
-                //setting value of the entity (preparing for push)
-                setEntityValues(entity, word.getValue());
-
-                return true;
             } else {
-
-                if (_sb == null) {
-                    _sb = new StringBuilder(_lineLength);
-                }
-
-                int producedLineLength = _sb.length() + DELIMITER.length() + wordLength;
-
-                if (producedLineLength <= _lineLength) {
-                    //produced line length is acceptable append word to buffer
-                    appendWord(word.getValue());
-
-                } else {
-                    //produced line length is not acceptable pushing buffer and buffering current (new) word
-
-                    int difference = _lineLength - _sb.length();
-
-                    //formatting and writing old buffered value, preparing entity values for push
-                    setEntityValues(
-                        entity,
-                        setAlignment(difference, _alignment, _sb.toString())
-                    );
-
-                    //buffering current (new) word
-                    bufferWord(word.getValue());
-
-                    return true;
-                }
-
-                //probably we can add one more word in the next invocation
+                appendWordToBuffer(word);
                 return false;
             }
-        } else if (_sb != null && _sb.length() > 0){
-            //ok word is null, probably we can write buffered word
-            //setting buffered word as a value of the entity (preparing for push)
-            setEntityValues(entity, _sb.toString());
-
-            return true;
         }
 
+        if (!isBufferEmpty() && isWordEmpty(word)) {
+            flushBuffer(entity);
+            return true;
+        }
 
         return false;
     }
@@ -113,30 +65,45 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
         return new StringLine();
     }
 
-    private void setEntityValues(StringLine entity, String value) {
-        entity.setLineIndex(++lineIndex);
-        entity.setValue(value);
+    private boolean isBufferFull() {
+        return _sb == null || _sb.length() >= _lineLength;
     }
 
-    private void appendWord(String word) {
-        if (_sb == null) {
-            _sb = new StringBuilder(_lineLength);
-        }
+    private boolean isBufferEmpty() {
+        return _sb == null || _sb.length() == 0;
+    }
 
+    private boolean isEnoughBufferSpaceForWord(Word word) {
+        return (_sb.length() + DELIMITER.length() + word.getValue().length()) <= _lineLength;
+    }
+
+    private boolean isWordEmpty(Word word) {
+        return word == null || word.getValue() == null || word.getValue().isEmpty();
+    }
+
+    private void createNewBuffer(Word word) {
+        //old buffer removed;
+        _sb = new StringBuilder(_lineLength);
+
+        //buffering new word
+        appendWordToBuffer(word);
+    }
+
+    private void appendWordToBuffer(Word word) {
         if(_sb.length() > 0) {
             //add space if it will be not a first append
             _sb.append(DELIMITER);
         }
 
-        _sb.append(word);
+        _sb.append(word.getValue());
     }
 
-    private void bufferWord(String word) {
-        //old buffer removed;
-        _sb = null;
+    private void flushBuffer(StringLine entity) {
+        int difference = _lineLength - _sb.length();
+        String line = setAlignment(difference, _alignment, _sb.toString());
 
-        //buffering new word
-        appendWord(word);
+        entity.setLineIndex(++lineIndex);
+        entity.setValue(line);
     }
 
     private String setAlignment(int difference, TextAlignment alignment, String s) {
@@ -161,4 +128,5 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
     private String getPaddingString(int length) {
         return length != 0 ? new String(new char[length]).replace('\0', ' ') : "";
     }
+
 }

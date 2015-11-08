@@ -14,17 +14,17 @@ import java.util.List;
 /**
  * Created by sereGkaluv on 01-Nov-15.
  */
-public class OutputFileSink implements Writable<List<StringLine>>{
+public class StringLinesFileSink implements Writable<List<StringLine>>{
     private static final String DEFAULT_OUTPUT_FILE_PATH = "out.txt";
 
     private Path _outputFilePath;
     private BufferedWriter _bw;
 
-    public OutputFileSink() {
+    public StringLinesFileSink() {
         this(DEFAULT_OUTPUT_FILE_PATH);
     }
 
-    public OutputFileSink(String outputFilePath) {
+    public StringLinesFileSink(String outputFilePath) {
 
         if(outputFilePath != null) {
             _outputFilePath = Paths.get(outputFilePath);

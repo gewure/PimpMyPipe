@@ -1,4 +1,4 @@
-package indsys.filter;
+package indsys.pipes;
 
 import indsys.entity.StringLine;
 import thirdparty.interfaces.Readable;
@@ -10,17 +10,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class TextToLineFilter implements Readable<StringLine> {
+public class TextLineSupplierPipe implements Readable<StringLine> {
     private static final String DEFAULT_SOURCE_FILE_PATH = "in.txt";
 
     private BufferedReader _br;
-    private static int lineIndex = -1;
 
-    public TextToLineFilter() {
+    public TextLineSupplierPipe() {
         this(DEFAULT_SOURCE_FILE_PATH);
     }
 
-    public TextToLineFilter(String sourceFilePath) {
+    public TextLineSupplierPipe(String sourceFilePath) {
         Path _sourceFilePath;
 
         if(sourceFilePath != null) {
@@ -43,7 +42,9 @@ public class TextToLineFilter implements Readable<StringLine> {
 
                 String line = _br.readLine();
                 if (line != null) {
-                    return new StringLine(++lineIndex, line);
+                    StringLine stringLine = new StringLine();
+                    stringLine.setValue(line);
+                    return stringLine;
                 } else {
                     _br.close();
                     _br = null;
