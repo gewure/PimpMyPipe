@@ -22,23 +22,89 @@ public class MainApp {
     private static final int BUFFER_SIZE = 8;
     private static final String SOURCE_CHAR_FILE_PATH = "charText.txt";
     private static final String SOURCE_TEXT_FILE_PATH = "aliceInWonderland.txt";
-    private static final String SOURCE_SHORT_FILE_PATH = "shortText.txt";
+    private static final String SOURCE_IN_FILE_PATH = "inFile.txt";
     private static final String FORMATTED_OUTPUT_FILE_PATH = "formatted_out.txt";
     private static final String INDEX_OUTPUT_FILE_PATH = "index_out.txt";
+    private static final Integer DEFAULT_LINE_LENGTH = 40;
 
     public static void main(String[] args) {
-        /* TASK A */
-        StringLinesFileSink aOutputFileSink = new StringLinesFileSink(INDEX_OUTPUT_FILE_PATH);
+        String task = null;
+        String inFile = null;
+        String indexOut = null;
+        String formattedOut = null;
+        TextAlignment alignment = null;
+        Integer lineLength = null;
 
-        runTaskAPush(SOURCE_SHORT_FILE_PATH, aOutputFileSink);
+        for (String arg : args) {
+            if (arg.startsWith("task=")) {
+                task = extractArgument(arg);
+            } else if (arg.startsWith("infile=")) {
+                inFile = extractArgument(arg);
+            } else if (arg.startsWith("indexOut=")) {
+                indexOut = extractArgument(arg);
+            } else if (arg.startsWith("formattedOut=")) {
+                formattedOut = extractArgument(arg);
+            } else if (arg.startsWith("alignment=")) {
+                alignment = parseTextAlignment(extractArgument(arg));
+            } else if (arg.startsWith("lineLength=")) {
+                lineLength = parseLineLength(extractArgument(arg));
+            } else {
+                System.out.println("This argument \"" + arg + "\" is not supported.");
+            }
+        }
 
+        if ("A".equalsIgnoreCase(task)) {
 
-        /* TASK B */
-        TextCharSupplierPipe textCharSupplierPipe = new TextCharSupplierPipe(SOURCE_CHAR_FILE_PATH);
-        StringLineFileSink bFormattedOutputFileSink = new StringLineFileSink(FORMATTED_OUTPUT_FILE_PATH);
-        StringLinesFileSink bIndexOutputFileSink = new StringLinesFileSink(INDEX_OUTPUT_FILE_PATH);
+            if (inFile == null) {
+                inFile = SOURCE_IN_FILE_PATH;
+                System.out.println("Input file argument was empty, using default value: " + SOURCE_IN_FILE_PATH);
+            }
 
-        runTaskB(textCharSupplierPipe, bFormattedOutputFileSink, bIndexOutputFileSink, TextAlignment.CENTERED, 30);
+            if (indexOut == null) {
+                indexOut = INDEX_OUTPUT_FILE_PATH;
+                System.out.println("Index Output argument was empty, using default value: " + INDEX_OUTPUT_FILE_PATH);
+            }
+
+            /* TASK A */
+            StringLinesFileSink aOutputFileSink = new StringLinesFileSink(indexOut);
+            runTaskAPush(inFile, aOutputFileSink);
+
+        } else if ("B".equalsIgnoreCase(task)) {
+
+            if (inFile == null) {
+                inFile = SOURCE_IN_FILE_PATH;
+                System.out.println("Input file argument was empty, using default value: " + SOURCE_IN_FILE_PATH);
+            }
+
+            if (indexOut == null) {
+                indexOut = INDEX_OUTPUT_FILE_PATH;
+                System.out.println("Index Output argument was empty, using default value: " + INDEX_OUTPUT_FILE_PATH);
+            }
+
+            if (formattedOut == null) {
+                formattedOut = FORMATTED_OUTPUT_FILE_PATH;
+                System.out.println("Formatted Output argument was empty, using default value: " + FORMATTED_OUTPUT_FILE_PATH);
+            }
+
+            if (alignment == null) {
+                alignment = TextAlignment.NONE;
+                System.out.println("Text alignment argument was empty, using default value: NONE");
+            }
+
+            if (lineLength == null) {
+                lineLength = DEFAULT_LINE_LENGTH;
+                System.out.println("Line length argument was empty, using default value: " + DEFAULT_LINE_LENGTH);
+            }
+
+            /* TASK B */
+            TextCharSupplierPipe textCharSupplierPipe = new TextCharSupplierPipe(inFile);
+            StringLineFileSink bFormattedOutputFileSink = new StringLineFileSink(formattedOut);
+            StringLinesFileSink bIndexOutputFileSink = new StringLinesFileSink(indexOut);
+            runTaskB(textCharSupplierPipe, bFormattedOutputFileSink, bIndexOutputFileSink, alignment, lineLength);
+
+        } else {
+            System.out.println("This task \"" + task + "\" is not supported.");
+        }
     }
 
     private static void runTaskAPull(Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
@@ -127,5 +193,32 @@ public class MainApp {
         //
         // 4. Delegation to Task A (indexing) (PULL)
         runTaskAPull(splitPipe, indexOutputSink);
+    }
+
+    private static String extractArgument(String arg) {
+        if (arg != null) {
+            String[] argParts = arg.split("=");
+
+            return argParts.length > 1 ? argParts[1] : null;
+        }
+        return null;
+    }
+
+    private static Integer parseLineLength(String s) {
+        try {
+            return Integer.valueOf(s);
+        } catch (NumberFormatException e) {
+            System.out.println("Error occurs while parsing line length. (" + s + ")");
+            return null;
+        }
+    }
+
+    private static TextAlignment parseTextAlignment(String s) {
+        try {
+            return s != null ? TextAlignment.valueOf(s.toUpperCase()) : null;
+        } catch (NullPointerException | IllegalArgumentException e) {
+            System.out.println("Error occurs while parsing text alignment. (" + s + ")");
+            return null;
+        }
     }
 }
