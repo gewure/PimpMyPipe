@@ -105,6 +105,8 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
     }
 
     private String applyAlignment(int difference, TextAlignment alignment, String s) {
+        if (difference <= 0) return s;
+
         switch (alignment) {
             case LEFT: {
                 return s + getPaddingString(difference);

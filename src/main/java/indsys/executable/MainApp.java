@@ -25,31 +25,62 @@ public class MainApp {
     private static final String SOURCE_IN_FILE_PATH = "inFile.txt";
     private static final String FORMATTED_OUTPUT_FILE_PATH = "formatted_out.txt";
     private static final String INDEX_OUTPUT_FILE_PATH = "index_out.txt";
+    private static final String DEFAULT_DICT_FILE_PATH = "dict.txt";
     private static final Integer DEFAULT_LINE_LENGTH = 40;
-
     public static void main(String[] args) {
         String task = null;
         String inFile = null;
         String indexOut = null;
         String formattedOut = null;
+        String dictFile = null;
         TextAlignment alignment = null;
         Integer lineLength = null;
 
         for (String arg : args) {
-            if (arg.startsWith("task=")) {
-                task = extractArgument(arg);
-            } else if (arg.startsWith("infile=")) {
-                inFile = extractArgument(arg);
-            } else if (arg.startsWith("indexOut=")) {
-                indexOut = extractArgument(arg);
-            } else if (arg.startsWith("formattedOut=")) {
-                formattedOut = extractArgument(arg);
-            } else if (arg.startsWith("alignment=")) {
-                alignment = parseTextAlignment(extractArgument(arg));
-            } else if (arg.startsWith("lineLength=")) {
-                lineLength = parseLineLength(extractArgument(arg));
+            String[] argParts = arg.split("=");
+
+            if(argParts.length == 2) {
+                switch (argParts[0]) {
+                    case "task" : {
+                        task = argParts[1];
+                        break;
+                    }
+
+                    case "inFile": {
+                        inFile = argParts[1];
+                        break;
+                    }
+
+                    case "indexOut": {
+                        indexOut = argParts[1];
+                        break;
+                    }
+
+                    case "formattedOut": {
+                        formattedOut = argParts[1];
+                        break;
+                    }
+
+                    case "dictFile": {
+                        dictFile = argParts[1];
+                        break;
+                    }
+
+                    case "alignment": {
+                        alignment = parseTextAlignment(argParts[1]);
+                        break;
+                    }
+
+                    case "lineLength": {
+                        lineLength = parseLineLength(argParts[1]);
+                        break;
+                    }
+
+                    default: System.out.println("Argument \"" + arg + "\" is not supported.");
+                }
+
             } else {
-                System.out.println("This argument \"" + arg + "\" is not supported.");
+                System.out.println("Argument \"" + arg + "\" is not supported.");
             }
         }
 
@@ -65,9 +96,14 @@ public class MainApp {
                 System.out.println("Index Output argument was empty, using default value: " + INDEX_OUTPUT_FILE_PATH);
             }
 
+            if (dictFile == null) {
+                dictFile = DEFAULT_DICT_FILE_PATH;
+                System.out.println("Dictionary argument was empty, using default value: " + DEFAULT_DICT_FILE_PATH);
+            }
+
             /* TASK A */
             StringLinesFileSink aOutputFileSink = new StringLinesFileSink(indexOut);
-            runTaskAPush(inFile, aOutputFileSink);
+            runTaskAPush(dictFile, inFile, aOutputFileSink);
 
         } else if ("B".equalsIgnoreCase(task)) {
 
@@ -79,6 +115,11 @@ public class MainApp {
             if (indexOut == null) {
                 indexOut = INDEX_OUTPUT_FILE_PATH;
                 System.out.println("Index Output argument was empty, using default value: " + INDEX_OUTPUT_FILE_PATH);
+            }
+
+            if (dictFile == null) {
+                dictFile = DEFAULT_DICT_FILE_PATH;
+                System.out.println("Dictionary argument was empty, using default value: " + DEFAULT_DICT_FILE_PATH);
             }
 
             if (formattedOut == null) {
@@ -100,14 +141,14 @@ public class MainApp {
             TextCharSupplierPipe textCharSupplierPipe = new TextCharSupplierPipe(inFile);
             StringLineFileSink bFormattedOutputFileSink = new StringLineFileSink(formattedOut);
             StringLinesFileSink bIndexOutputFileSink = new StringLinesFileSink(indexOut);
-            runTaskB(textCharSupplierPipe, bFormattedOutputFileSink, bIndexOutputFileSink, alignment, lineLength);
+            runTaskB(textCharSupplierPipe, bFormattedOutputFileSink, bIndexOutputFileSink, alignment, lineLength, dictFile);
 
         } else {
-            System.out.println("This task \"" + task + "\" is not supported.");
+            System.out.println("Task \"" + task + "\" is not supported.");
         }
     }
 
-    private static void runTaskAPull(Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
+    private static void runTaskAPull(String dictFile, Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
 
@@ -116,10 +157,10 @@ public class MainApp {
             new LineIndexFilter(input, stringLinePipe)
         ).start();
 
-        runTaskA(stringLinePipe, outputSink);
+        runTaskA(dictFile, stringLinePipe, outputSink);
     }
 
-    private static void runTaskAPush(String sourceFilePath, Writable<List<StringLine>> outputSink) {
+    private static void runTaskAPush(String dictFile, String sourceFilePath, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
 
@@ -128,10 +169,10 @@ public class MainApp {
             new LineIndexFilter(sourceFilePath, stringLinePipe)
         ).start();
 
-        runTaskA(stringLinePipe, outputSink);
+        runTaskA(dictFile, stringLinePipe, outputSink);
     }
 
-    private static void runTaskA(Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
+    private static void runTaskA(String dictFile, Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<List<Word>> wordPipe = new BufferedSyncPipe<>(BUFFER_SIZE * BUFFER_SIZE);
         BufferedSyncPipe<List<List<Word>>> wordShiftedPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
@@ -150,7 +191,7 @@ public class MainApp {
 
         // 4. Shifted (List<Word>) -> Filtered with Dictionary (List<Word>)
         new Thread(
-            new WordDictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe)
+            new WordDictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe, dictFile)
         ).start();
 
         // 5. Filtered with Dictionary (List<Word>) -> List<StringLine>
@@ -169,7 +210,8 @@ public class MainApp {
         Writable<StringLine> formattedOutputSink,
         Writable<List<StringLine>> indexOutputSink,
         TextAlignment textAlignment,
-        int lineLength
+        int lineLength,
+        String dictFile
     ) {
 
         BufferedSyncPipe<Word> wordPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
@@ -192,16 +234,7 @@ public class MainApp {
         //
         //
         // 4. Delegation to Task A (indexing) (PULL)
-        runTaskAPull(splitPipe, indexOutputSink);
-    }
-
-    private static String extractArgument(String arg) {
-        if (arg != null) {
-            String[] argParts = arg.split("=");
-
-            return argParts.length > 1 ? argParts[1] : null;
-        }
-        return null;
+        runTaskAPull(dictFile, splitPipe, indexOutputSink);
     }
 
     private static Integer parseLineLength(String s) {
