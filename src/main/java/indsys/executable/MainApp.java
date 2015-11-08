@@ -59,7 +59,7 @@ public class MainApp {
 
         // 1. Source (PUSH) -> StringLine
         new Thread(
-                new LineIndexFilter(sourceFilePath, stringLinePipe)
+            new LineIndexFilter(sourceFilePath, stringLinePipe)
         ).start();
 
         runTaskA(stringLinePipe, outputSink);

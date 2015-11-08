@@ -18,7 +18,6 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
     private final int _lineLength;
     private final TextAlignment _alignment;
 
-    private int lineIndex = -1;
     private StringBuilder _sb;
 
     public WordToLineBuilderFilter(Readable<Word> input, Writable<StringLine> output, TextAlignment type, int lineLength)
@@ -100,13 +99,12 @@ public class WordToLineBuilderFilter extends DataEnrichmentFilter<Word, StringLi
 
     private void flushBuffer(StringLine entity) {
         int difference = _lineLength - _sb.length();
-        String line = setAlignment(difference, _alignment, _sb.toString());
+        String line = applyAlignment(difference, _alignment, _sb.toString());
 
-        entity.setLineIndex(++lineIndex);
         entity.setValue(line);
     }
 
-    private String setAlignment(int difference, TextAlignment alignment, String s) {
+    private String applyAlignment(int difference, TextAlignment alignment, String s) {
         switch (alignment) {
             case LEFT: {
                 return s + getPaddingString(difference);

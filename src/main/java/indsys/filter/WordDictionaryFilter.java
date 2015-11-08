@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class WordDictionaryFilter extends DataEnrichmentFilter<List<List<Word>>, List<List<Word>>> {
     private static final String DEFAULT_DICT_FILE_PATH = "dict.txt";
-    public static final Set<String> DICTIONARY = new HashSet<>();
+    private static final Set<String> DICTIONARY = new HashSet<>();
 
     public WordDictionaryFilter(Readable<List<List<Word>>> input, Writable<List<List<Word>>> output)
     throws InvalidParameterException {
