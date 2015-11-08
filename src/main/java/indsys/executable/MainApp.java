@@ -19,7 +19,7 @@ import java.util.List;
  * Created by sereGkaluv on 01-Nov-15.
  */
 public class MainApp {
-    private static final int BUFFER_SIZE = 8;
+    private static final int BUFFER_SIZE = 16;
     private static final String SOURCE_CHAR_FILE_PATH = "charText.txt";
     private static final String SOURCE_TEXT_FILE_PATH = "aliceInWonderland.txt";
     private static final String SOURCE_IN_FILE_PATH = "inFile.txt";
