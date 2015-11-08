@@ -6,8 +6,6 @@ import thirdparty.interfaces.Writable;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
-
-
 public abstract class DataTransformationFilter<T> extends AbstractFilter<T,T> {
 
     public DataTransformationFilter(Readable<T> input, Writable<T> output) throws InvalidParameterException {
@@ -53,7 +51,7 @@ public abstract class DataTransformationFilter<T> extends AbstractFilter<T,T> {
                     writeOutput(input);
                 }
                 
-            }while(input != null);
+            } while(input != null);
             sendEndSignal();
         } catch (StreamCorruptedException e) {
             e.printStackTrace();

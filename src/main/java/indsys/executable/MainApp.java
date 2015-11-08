@@ -19,6 +19,7 @@ import java.util.List;
  * Created by sereGkaluv on 01-Nov-15.
  */
 public class MainApp {
+
     private static final int BUFFER_SIZE = 16;
     private static final String SOURCE_CHAR_FILE_PATH = "charText.txt";
     private static final String SOURCE_TEXT_FILE_PATH = "aliceInWonderland.txt";
@@ -27,7 +28,13 @@ public class MainApp {
     private static final String INDEX_OUTPUT_FILE_PATH = "index_out.txt";
     private static final String DEFAULT_DICT_FILE_PATH = "dict.txt";
     private static final Integer DEFAULT_LINE_LENGTH = 40;
+
+    /**
+     * MAIN method
+     * @param args
+     */
     public static void main(String[] args) {
+
         String task = null;
         String inFile = null;
         String indexOut = null;
@@ -148,6 +155,12 @@ public class MainApp {
         }
     }
 
+    /**
+     *
+     * @param dictFile
+     * @param input
+     * @param outputSink
+     */
     private static void runTaskAPull(String dictFile, Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
@@ -160,6 +173,12 @@ public class MainApp {
         runTaskA(dictFile, stringLinePipe, outputSink);
     }
 
+    /**
+     *
+     * @param dictFile
+     * @param sourceFilePath
+     * @param outputSink
+     */
     private static void runTaskAPush(String dictFile, String sourceFilePath, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
@@ -172,6 +191,13 @@ public class MainApp {
         runTaskA(dictFile, stringLinePipe, outputSink);
     }
 
+    /**
+     * PUSH strategy
+     *
+     * @param dictFile
+     * @param input
+     * @param outputSink
+     */
     private static void runTaskA(String dictFile, Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<List<Word>> wordPipe = new BufferedSyncPipe<>(BUFFER_SIZE * BUFFER_SIZE);
@@ -205,6 +231,16 @@ public class MainApp {
         ).start();
     }
 
+    /**
+     * Pull Strategy
+     *
+     * @param charPipe
+     * @param formattedOutputSink
+     * @param indexOutputSink
+     * @param textAlignment
+     * @param lineLength
+     * @param dictFile
+     */
     private static void runTaskB(
         Readable<Char> charPipe,
         Writable<StringLine> formattedOutputSink,
@@ -237,6 +273,9 @@ public class MainApp {
         runTaskAPull(dictFile, splitPipe, indexOutputSink);
     }
 
+    /*******************/
+    /* HELPING METHODS */
+    /******************/
     private static Integer parseLineLength(String s) {
         try {
             return Integer.valueOf(s);

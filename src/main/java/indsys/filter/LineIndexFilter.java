@@ -15,12 +15,14 @@ import java.security.InvalidParameterException;
 public class LineIndexFilter extends DataTransformationFilter<StringLine> {
     private int lineIndex = -1;
 
+    /* constructor PULL strategy */
     public LineIndexFilter(Readable<StringLine> input, Writable<StringLine> output)
     throws InvalidParameterException {
         //Pull strategy
         super(input, output);
     }
 
+    /* constructor PUSH strategy */
     public LineIndexFilter(String sourceFilePath, Writable<StringLine> output) {
         //Push strategy
         super(new TextLineSupplierPipe(sourceFilePath), output);
