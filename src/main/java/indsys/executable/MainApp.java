@@ -164,13 +164,41 @@ public class MainApp {
     private static void runTaskAPull(String dictFile, Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
+        BufferedSyncPipe<List<Word>> wordPipe = new BufferedSyncPipe<>(BUFFER_SIZE * BUFFER_SIZE);
+        BufferedSyncPipe<List<List<Word>>> wordShiftedPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
+        BufferedSyncPipe<List<List<Word>>> dictionaryCleanedPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
+        BufferedSyncPipe<List<StringLine>> sortedLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
 
-        // 1. String (PULL) -> StringLine
+        // 6. List<StringLine> -> Sorted alphabetically (List<StringLine>) -> outputSink
+        new Thread(
+            new LineSortFilter(sortedLinePipe, outputSink)
+        ).start();
+
+        // 5. Filtered with Dictionary (List<Word>) -> List<StringLine>
+        new Thread(
+            new WordsToLinesFilter(dictionaryCleanedPipe, sortedLinePipe)
+        ).start();
+
+        // 4. Shifted (List<Word>) -> Filtered with Dictionary (List<Word>)
+        new Thread(
+            new WordDictionaryFilter(wordShiftedPipe, dictionaryCleanedPipe, dictFile)
+        ).start();
+
+        // 3. List<Word> -> Shifted (List<Word>)
+        new Thread(
+            new WordShiftFilter(wordPipe, wordShiftedPipe)
+        ).start();
+
+
+        // 2. StringLine -> List<Word>
+        new Thread(
+            new LineToWordFilter(stringLinePipe, wordPipe)
+        ).start();
+
+        // 1. String -> StringLine
         new Thread(
             new LineIndexFilter(input, stringLinePipe)
         ).start();
-
-        runTaskA(dictFile, stringLinePipe, outputSink);
     }
 
     /**
@@ -182,32 +210,19 @@ public class MainApp {
     private static void runTaskAPush(String dictFile, String sourceFilePath, Writable<List<StringLine>> outputSink) {
 
         BufferedSyncPipe<StringLine> stringLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
-
-        // 1. Source (PUSH) -> StringLine
-        new Thread(
-            new LineIndexFilter(sourceFilePath, stringLinePipe)
-        ).start();
-
-        runTaskA(dictFile, stringLinePipe, outputSink);
-    }
-
-    /**
-     * PUSH strategy
-     *
-     * @param dictFile
-     * @param input
-     * @param outputSink
-     */
-    private static void runTaskA(String dictFile, Readable<StringLine> input, Writable<List<StringLine>> outputSink) {
-
         BufferedSyncPipe<List<Word>> wordPipe = new BufferedSyncPipe<>(BUFFER_SIZE * BUFFER_SIZE);
         BufferedSyncPipe<List<List<Word>>> wordShiftedPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
         BufferedSyncPipe<List<List<Word>>> dictionaryCleanedPipe = new BufferedSyncPipe<>(BUFFER_SIZE);
         BufferedSyncPipe<List<StringLine>> sortedLinePipe = new BufferedSyncPipe<>(BUFFER_SIZE);
 
+        // 1. Source -> StringLine
+        new Thread(
+            new LineIndexFilter(sourceFilePath, stringLinePipe)
+        ).start();
+
         // 2. StringLine -> List<Word>
         new Thread(
-            new LineToWordFilter(input, wordPipe)
+            new LineToWordFilter(stringLinePipe, wordPipe)
         ).start();
 
         // 3. List<Word> -> Shifted (List<Word>)
@@ -232,8 +247,6 @@ public class MainApp {
     }
 
     /**
-     * Pull Strategy
-     *
      * @param charPipe
      * @param formattedOutputSink
      * @param indexOutputSink
